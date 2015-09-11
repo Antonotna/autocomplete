@@ -1,6 +1,7 @@
 import sys
 import re
 import argparse
+from netaddr import *
 
 parser = argparse.ArgumentParser()
 
@@ -20,8 +21,11 @@ desc = args.desc
 d = re.split('\(',desc)
 
 
-ip = args.ip
+ip = IPNetwork(args.ip+'/27')
+next_net = ip.next()
+l29 = list(next_net.subnet(29))
 
+'''
 lip=ip.split('.')
 three = '.'.join(lip[0:3])
 if(args.z):
@@ -31,19 +35,25 @@ else:
 vpn = nlip
 mmedia = nlip + 8
 sw = nlip + 16
-
+'''
 
 #Network
-out = host + "\t" + three + "." + str(nlip) + "\t# /27 " + desc + "\n"
+out = host + "\t" + str(next_net.network) + "\t# /" + str(next_net.prefixlen) + " " + desc + "\n"
 
 #VPN
 if(args.v):
- out = out + host + "-vpn\t" + three + "." + str(nlip) + "\t# /29 " + d[0] + "VPN (." + str(vpn+1) + "-cisco, ." + str(vpn+2) + "-asa)\n"
+ vnet = l29[0]
+ vhosts = list(vnet.iter_hosts())
+ out = out + host + "-vpn\t" + str(vnet.network) + "\t# /" + str(vnet.prefixlen) + " " + d[0] + "VPN (." + str(vhosts[0].words[3]) + "-cisco, ." + str(vhosts[1].words[3]) + "-asa)\n"
 
 #MMEDIA
-out = out + host + "-mmedia\t" + three + "." +str(mmedia) + "\t# /29 " + d[0] + "MMEDIA (." + str(mmedia+1) + "-cisco, ." + str(mmedia+6)+ "-IPOffice)\n"
+mmnet = l29[1]
+mmhosts = list(mmnet.iter_hosts())
+out = out + host + "-mmedia\t" + str(mmnet.network) + "\t# /" + str(mmnet.prefixlen) + " " + d[0] + "MMEDIA (." + str(mmhosts[0].words[3]) + "-cisco, ." + str(mmhosts[5].words[3])+ "-IPOffice)\n"
 
 #MGMT
-out = out + host + "-mgmt\t" + three + "." + str(sw) + "\t# /29 " + d[0] + "MGMT (." + str(sw+1) + "-cisco, ." + str(sw+2) + "-." + str(sw+6) + "-sw*)\n"
+mgnet = l29[2]
+mghosts = list(mgnet.iter_hosts())
+out = out + host + "-mgmt\t" + str(mgnet.network) + "\t# /" + str(mgnet.prefixlen) + " " + d[0] + "MGMT (." + str(mghosts[0].words[3]) + "-cisco, ." + str(mghosts[1].words[3]) + "-." + str(mghosts[5].words[3]) + "-sw*)\n"
 
 sys.stdout.write(out)
