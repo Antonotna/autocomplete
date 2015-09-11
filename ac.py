@@ -9,6 +9,7 @@ parser.add_argument("host",type=str,help="Hostname")
 parser.add_argument("ip",type=str,help="IP address of previously network")
 parser.add_argument("desc",type=str,help="Description")
 parser.add_argument("-v", action="store_true", help="add vpn string")
+#parser.add_argument("-z", action="store_true", help="If current network is zero you should set it in ip field and flag 'z' up")
 
 args = parser.parse_args()
 
@@ -21,7 +22,10 @@ d = re.split('\(',desc)
 
 
 ip = IPNetwork(args.ip+'/27')
-next_net = ip.next()
+if(ip.network.words[3] == 0):
+ next_net = ip
+else:
+ next_net = ip.next()
 l29 = list(next_net.subnet(29))
 
 #Network
