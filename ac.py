@@ -11,6 +11,7 @@ parser.add_argument("ip",type=str,help="IP address of previously network")
 parser.add_argument("desc",type=str,help="Description")
 parser.add_argument("-v", action="store_true", help="add vpn string")
 parser.add_argument("-z", action="store_true", help="If current network is zero you should set it in ip field and flag 'z' up")
+parser.add_argument("-m", action="store_true", help="For MICRO office format generation")
 
 args = parser.parse_args()
 
@@ -51,7 +52,11 @@ if(args.v):
 #MMEDIA
 mmnet = l29[1]
 mmhosts = list(mmnet.iter_hosts())
-out = out + host + "-mmedia\t" + str(mmnet.network) + "\t# /" + str(mmnet.prefixlen) + " " + d[0] +\
+if(args.m):
+ out = out + host + "-iptel\t" + str(mmnet.network) + "\t# /" + str(mmnet.prefixlen) + " " + d[0] +\
+"IPTEL (." + str(mmhosts[0].words[3]) + "-cisco, ." + str(mmhosts[2].words[3]) + "-." + str(mmhosts[5].words[3]) + "-IPPhone)\n"
+else:
+ out = out + host + "-mmedia\t" + str(mmnet.network) + "\t# /" + str(mmnet.prefixlen) + " " + d[0] +\
 "MMEDIA (." + str(mmhosts[0].words[3]) + "-cisco, ." + str(mmhosts[5].words[3])+ "-IPOffice)\n"
 
 #MGMT
@@ -65,8 +70,8 @@ out = out + "\n\n---------------Cisco Config Backup---------------\n\n"
 #Cisco Config Backup
 out = out + loop + "," + host + ",vtb24.ru,," + host + ",*,*,*,*," + region + ",Branch,WAN\n"
 for i in range(1,6):
- sw_name = str(mghosts[i]) + "," + host + "-sw" + str(i)
- out = out + sw_name + ",vtb24.ru,," + sw_name + ",*,*,*,*," + region + ",Branch,LAN\n"
+ sw_name = host + "-sw" + str(i)
+ out = out + str(mghosts[i]) + "," + sw_name + ",vtb24.ru,," + sw_name + ",*,*,*,*," + region + ",Branch,LAN\n"
 
 out = out + "\n\n--------------------DNS--------------------------\n\n"
 
