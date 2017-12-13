@@ -65,15 +65,7 @@ mghosts = list(mgnet.iter_hosts())
 out = out + host + "-mgmt\t" + str(mgnet.network) + "\t# /" + str(mgnet.prefixlen) + " " + d[0] +\
 "MGMT (." + str(mghosts[0].words[3]) + "-cisco, ." + str(mghosts[1].words[3]) + "-." + str(mghosts[5].words[3]) + "-sw*)\n"
 
-out = out + "\n\n---------------Cisco Config Backup---------------\n\n"
-
-#Cisco Config Backup
-out = out + loop + "," + host + ",vtb24.ru,," + host + ",*,*,*,*," + region + ",Branch,WAN\n"
-for i in range(1,6):
- sw_name = host + "-sw" + str(i)
- out = out + str(mghosts[i]) + "," + sw_name + ",vtb24.ru,," + sw_name + ",*,*,*,*," + region + ",Branch,LAN\n"
-
-out = out + "\n\n--------------------DNS--------------------------\n\n"
+out = out + "\n\n------------------------DNS-----------------------\n\n"
 
 #DNS
 out = out + host + "\t" + loop + "\n"
